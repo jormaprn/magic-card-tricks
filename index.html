@@ -22,7 +22,7 @@
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
    
 :root{--bg:#100b17;--bg2:#1c1021;--surface:#201424;--surface2:#2b192b;--lime:#efcb83;--lav:#d8a5e8;--muted:#c0abbf;--line:rgba(240,201,133,.18)}body{background:radial-gradient(ellipse at 50% -10%,#512438 0%,transparent 48%),radial-gradient(ellipse at 100% 45%,#28152c,transparent 48%),#100b17}.hero-art{background:radial-gradient(ellipse,#59332e88,transparent 65%)}.hero-art:before{content:'✧  ✦  ☾  ✧';position:absolute;top:8%;left:10%;right:10%;text-align:center;color:#efcb83;letter-spacing:1.2em;font-size:24px;animation:twinkle 3s infinite alternate}.floating-card.front{animation:floatMagic 4s ease-in-out infinite}.floating-card.back{background:repeating-linear-gradient(45deg,#552a3f 0 6px,#b78a57 7px,#552a3f 8px 14px)}.stage-card,.lesson-box,.trick-card{border-color:#a7795544}.diagram-shell{background:radial-gradient(ellipse,#254c43,#102c29 70%,#0b1e1e);border:1px solid #a77955;border-radius:16px}.cover[data-color="gold"]{background:radial-gradient(ellipse,#7a5030,#2b1727)}.stage-controls{flex-wrap:wrap}.stage-controls .btn{flex:1 1 auto}.magic-move{animation:magicMove 2.2s cubic-bezier(.25,.7,.3,1) both;transform-box:fill-box;transform-origin:center}.magic-reveal{animation:magicReveal 2.2s ease both;transform-box:fill-box;transform-origin:center}.diagram-shell svg g.magic-reveal[transform]{animation:legacyReveal .85s ease both}@keyframes legacyReveal{from{opacity:0}to{opacity:1}}.magic-pulse{animation:twinkle 1.6s ease infinite alternate}.diagram-shell svg>g:not(.magic-move){animation:appear .65s ease both}.diagram-shell svg path[marker-end]{stroke-dasharray:8 6;animation:dash 1s linear infinite}.magic-note{font-size:12px;color:var(--muted);padding:6px 0}@keyframes dash{to{stroke-dashoffset:-28}}@keyframes magicMove{0%{transform:translateX(0) rotate(-8deg)}45%{transform:translateX(145px) translateY(-32px) rotate(10deg)}75%,100%{transform:translateX(180px) rotate(0)}}@keyframes magicReveal{0%,40%{opacity:0;transform:scale(.75)}75%,100%{opacity:1;transform:scale(1)}}@keyframes appear{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}@keyframes twinkle{from{opacity:.45}to{opacity:1}}@keyframes floatMagic{0%,100%{transform:translate(-50px,-12px) rotate(-16deg)}50%{transform:translate(-50px,-27px) rotate(-12deg)}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}} 
-</style>
+.cover svg{width:100%;height:100%;max-width:340px;display:block;filter:drop-shadow(0 5px 5px #0004);transition:transform .25s ease}.trick-card:hover .cover svg{transform:scale(1.045)}.cover{cursor:pointer;background:radial-gradient(ellipse at 50% 48%,#543047,#1b1428 76%)}.cover[data-color="gold"]{background:radial-gradient(ellipse at center,#59412e,#251626 76%)}</style>
 </head>
 <body>
 <header class="topbar container">
@@ -125,11 +125,55 @@ function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))
 function save(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function $(id){return document.getElementById(id)}
+
+function coverArt(t){
+const C=(v,x,y,rot=0)=>svgCard(x-29,y-40,58,80,v,{rotate:rot});
+const O=(v,x,y,scale=.65)=>'<g transform="translate('+x+' '+y+') scale('+scale+')">'+magicObject(v,0,0)+'</g>';
+const arrow=(x,y)=>'<path d="M'+(x-17)+' '+y+'h34m-8 -7 8 7 -8 7" stroke="#eaca8a" stroke-width="2" fill="none" stroke-linecap="round"/>';
+const label=(v,x,y)=>'<text x="'+x+'" y="'+y+'" text-anchor="middle" fill="#efd4a0" font-size="12" font-weight="700">'+esc(v)+'</text>';
+const deck=(x,y,v='back')=>[0,1,2,3].map(i=>C(i===3?v:'back',x+i*2,y-i*3)).join('');
+const grid=(rows)=>Array.from({length:rows*3},(_,i)=>'<g transform="translate('+(116+i%3*35)+' '+(27+Math.floor(i/3)*(rows===7?16:34))+') scale('+(rows===7?.28:.46)+')">'+C(['A♠','7♥','Q♦','2♣','8♠','K♥','3♦'][i%7],0,0)+'</g>').join('');
+let art='';
+switch(t.id){
+case 'paberennustus':art=C('back',90,79,-12)+C('back',151,79)+C('A♠',212,79,12)+label('✦ ENNUSTUS',150,145);break;
+case 'varvivahetus':art=C('Q♠',83,81,-8)+arrow(150,80)+C('7♥',217,81,8);break;
+case 'seljaga':art=C('back',95,82,-22)+C('back',130,80,-10)+C('7♥',161,70,8)+C('back',198,82,20);break;
+case 'neljaassa':art=['A♠','A♥','A♣','A♦'].map((v,i)=>C(v,60+i*60,82,(i-1.5)*5)).join('');break;
+case 'paarid':art=['2♠','2♥','4♣','4♦'].map((v,i)=>C(v,60+i*60,80)).join('')+label('2 + 2     ·     4 + 4',150,143);break;
+case 'sosin':art=C('A♠',88,80,-14)+C('7♥',150,65)+C('Q♦',212,80,14);break;
+case 'tasku':art='<path d="M154 40H250V100L202 134 154 100Z" fill="#685064" stroke="#c59d78" stroke-width="2" stroke-dasharray="4 3"/>'+C('8♦',202,59,-9)+deck(69,87)+arrow(123,90);break;
+case 'sama':art=C('7♥',80,82,-12)+label('=',150,85)+C('7♥',220,82,12);break;
+case 'spelling':art=deck(78,80)+C('A♠',218,80)+label('M A A G I A',150,145)+arrow(150,80);break;
+case 'paberkaart':art=C('7♥',65,87,-12)+C('Q♥',102,72,5)+C('A♠',198,72,-5)+C('K♣',235,87,12);break;
+case 'myntkadub':art=O('hand',80,80,.85)+O('coin',80,68,.65)+arrow(150,82)+O('hand',220,80,.85)+label('?',220,85);break;
+case 'myntkorv':art='<path d="M132 130Q107 113 109 85Q96 43 131 29Q178 17 185 54Q193 80 170 92Q153 101 157 120Q149 137 132 130Z" fill="#d6a17e" stroke="#875d46" stroke-width="2"/><path d="M131 54Q163 33 168 64Q173 80 147 87L142 103" stroke="#a87559" stroke-width="4" fill="none" stroke-linecap="round"/>'+O('coin',210,75,.8);break;
+case 'myntklaas':art=O('coin',70,104,.75)+arrow(123,85)+O('glass',206,80,1.02)+O('coin',206,119,.55);break;
+case 'kumm':art=O('hand',79,86,.85)+O('hand',221,86,.85)+'<ellipse cx="66" cy="52" rx="16" ry="7" fill="none" stroke="#efbc58" stroke-width="5"/><ellipse cx="237" cy="60" rx="17" ry="7" fill="none" stroke="#efbc58" stroke-width="5"/>'+arrow(150,85);break;
+case 'pliiats':art='<g transform="translate(150 83) rotate(-14)"><path d="M-98 0Q-42 -28 0 0T91 0" fill="none" stroke="#efb84b" stroke-width="12" stroke-linecap="round"/><path d="M-108 0L-96 -6 -96 6Z" fill="#edd0a0"/><path d="M-108 0L-103 -2 -103 2Z" fill="#302631"/><path d="M91 0h12" stroke="#e3a2a8" stroke-width="12" stroke-linecap="round"/></g><path d="M80 43q70 -22 140 0M80 120q70 22 140 0" fill="none" stroke="#eaca8a" stroke-dasharray="4 5" opacity=".55"/>';break;
+case 'salvratt':art='<g fill="#e9dfd0" stroke="#bda98d"><path d="M48 48l35 4 -12 36 -29 -9Z"/><path d="M82 93l26 -14 18 34 -36 13Z"/><path d="M107 42l17 23 -23 19 -17 -28Z"/></g>'+arrow(150,82)+O('cloth',224,81,.9);break;
+case 'kirjaklambrid':art='<g fill="none" stroke="#d6d9df" stroke-width="4" stroke-linecap="round"><rect x="50" y="48" width="25" height="60" rx="12" transform="rotate(-20 62 78)"/><rect x="87" y="48" width="25" height="60" rx="12" transform="rotate(20 99 78)"/><rect x="195" y="47" width="25" height="60" rx="12" transform="rotate(-35 207 77)"/><rect x="216" y="64" width="25" height="60" rx="12" transform="rotate(35 228 94)"/></g>'+arrow(150,84);break;
+case 'lusikas':art='<g fill="#cbd0d7" stroke="#edf0f5" stroke-width="2"><ellipse cx="96" cy="48" rx="17" ry="25" transform="rotate(-30 96 48)"/><path d="M105 68L139 125" stroke="#cbd0d7" stroke-width="11" stroke-linecap="round"/><ellipse cx="204" cy="48" rx="17" ry="25"/><path d="M204 73Q204 108 247 109" fill="none" stroke="#cbd0d7" stroke-width="11" stroke-linecap="round"/></g>'+arrow(150,84);break;
+case 'n66r':art='<path d="M23 83H115M181 83C211 83 230 51 242 67S210 113 202 91 235 74 277 91" fill="none" stroke="#d2ab70" stroke-width="7" stroke-linecap="round"/><path d="M23 83H115M181 83C211 83 230 51 242 67S210 113 202 91 235 74 277 91" fill="none" stroke="#f2dcb0" stroke-width="2" stroke-dasharray="3 4"/>'+arrow(150,83);break;
+case 'arvuennustus':art=O('paper',150,80,1.25)+'<text x="150" y="88" fill="#563744" font-size="32" text-anchor="middle" font-family="Georgia" font-weight="bold">1089</text>';break;
+case 'ristloige':art=deck(120,88)+C('back',120,75,90)+O('paper',230,80,.62)+label('✦',230,84);break;
+case 'naaber':art=C('K♣',117,79,-8)+C('7♥',184,79,8)+label('?',150,145);break;
+case '21':art=grid(7)+label('21 KAARTI',150,151);break;
+case '9':art=grid(3)+label('9 KAARTI',150,145);break;
+case 'kymnes':art=deck(95,83)+C('Q♠',207,83)+label('10',150,145);break;
+case 'valik':art=C('back',70,83,-10)+C('back',125,75)+C('back',180,75)+C('back',235,83,10)+label('?',150,145);break;
+case 'kadunud':art=['A♥','2♥','3♥','4♥','5♥'].map((v,i)=>i===2?'<rect x="127" y="43" width="46" height="78" rx="6" fill="none" stroke="#eaca8a" stroke-dasharray="5 4"/>'+label('?',150,86):C(v,45+i*52,82,(i-2)*5)).join('');break;
+case 'arvud':art=C('5♥',84,82,-10)+label('× 2 + 5',180,65)+label('?',180,104);break;
+case 'kuningad':art=['K♠','K♥','K♣','K♦'].map((v,i)=>C(v,60+i*60,82,(i-1.5)*6)).join('');break;
+default:art=C('A♠',150,80);
+}
+const uid='cover-'+t.id;return '<svg viewBox="0 0 300 166" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+esc(t.title)+'"><defs><linearGradient id="'+uid+'-back" x2="1" y2="1"><stop stop-color="#96586c"/><stop offset="1" stop-color="#422039"/></linearGradient><linearGradient id="'+uid+'-coin" x2="1" y2="1"><stop stop-color="#fff0b4"/><stop offset="1" stop-color="#b37c32"/></linearGradient></defs><ellipse cx="150" cy="137" rx="115" ry="13" fill="#000" opacity=".18"/>'+art.replaceAll('url(#backGrad)','url(#'+uid+'-back)').replaceAll('url(#coinGold)','url(#'+uid+'-coin)')+'</svg>';
+}
+
 function renderCatalog(){
   document.querySelectorAll('.filter').forEach(b=>{const active=b.dataset.filter===app.filter;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
   const q=app.query.trim().toLocaleLowerCase('et');const shown=tricks.filter(t=>(app.filter==='all'||(app.filter==='fav'?app.favorites.has(t.id):app.filter==='wow'?t.wow:app.filter==='cards'?!t.object:app.filter==='objects'?t.object:t.level===+app.filter))&&[t.title,t.summary,t.category,t.intro].join(' ').toLocaleLowerCase('et').includes(q));
   $('resultCount').textContent=shown.length+' trikki';
-  $('trickGrid').innerHTML=shown.length?shown.map((t,i)=>`<article class="trick-card"><div class="cover" data-color="${t.color}" aria-hidden="true"><div class="floating-small">◇</div><div class="floating-small">${t.icon}</div><div class="floating-small">${t.object?"✦":['A','K','7'][i%3]+"♠"}</div></div><div class="card-content"><div class="card-overline"><span class="level-pill" data-level="${t.level}">${'●'.repeat(t.level)} ${LEVEL[t.level]}</span><span class="time">${t.wow?"✦ WOW · ":t.object?"Ese · ":""}◷ ${t.time}</span></div><h3>${esc(t.title)}</h3><p class="desc">${esc(t.summary)}</p><div class="card-foot"><button class="link-arrow" data-open="${t.id}">Ava õpetus ↗</button><button class="heart ${app.favorites.has(t.id)?'active':''}" data-fav="${t.id}" aria-label="${app.favorites.has(t.id)?'Eemalda lemmikutest':'Lisa lemmikutesse'}" aria-pressed="${app.favorites.has(t.id)}">${app.favorites.has(t.id)?'♥':'♡'}</button></div></div></article>`).join(''):'<div class="empty">Ühtegi sobivat trikki ei leitud.<br>Proovi teist otsingut või filtrit.</div>';
+  $('trickGrid').innerHTML=shown.length?shown.map((t,i)=>`<article class="trick-card"><div class="cover" data-color="${t.color}" data-open="${t.id}" aria-hidden="true">${coverArt(t)}</div><div class="card-content"><div class="card-overline"><span class="level-pill" data-level="${t.level}">${'●'.repeat(t.level)} ${LEVEL[t.level]}</span><span class="time">${t.wow?"✦ WOW · ":t.object?"Ese · ":""}◷ ${t.time}</span></div><h3>${esc(t.title)}</h3><p class="desc">${esc(t.summary)}</p><div class="card-foot"><button class="link-arrow" data-open="${t.id}">Ava õpetus ↗</button><button class="heart ${app.favorites.has(t.id)?'active':''}" data-fav="${t.id}" aria-label="${app.favorites.has(t.id)?'Eemalda lemmikutest':'Lisa lemmikutesse'}" aria-pressed="${app.favorites.has(t.id)}">${app.favorites.has(t.id)?'♥':'♡'}</button></div></div></article>`).join(''):'<div class="empty">Ühtegi sobivat trikki ei leitud.<br>Proovi teist otsingut või filtrit.</div>';
 }
 function toggleFav(id){app.favorites.has(id)?app.favorites.delete(id):app.favorites.add(id);save('cardmagic_favs',[...app.favorites]);renderCatalog();if(app.active===id)renderLessonFavorite()}
 function renderLessonFavorite(){const yes=app.favorites.has(app.active);$('lessonFavorite').textContent=yes?'♥':'♡';$('lessonFavorite').classList.toggle('active',yes);$('lessonFavorite').setAttribute('aria-label',yes?'Eemalda lemmikutest':'Lisa lemmikutesse');$('lessonFavorite').setAttribute('aria-pressed',String(yes))}
